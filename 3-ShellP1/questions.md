@@ -1,30 +1,31 @@
 1. In this assignment I suggested you use `fgets()` to get user input in the main while loop. Why is `fgets()` a good choice for this application?
 
-    > **Answer**:  _start here_
+    > **Answer**:  It helps avoid buffer overflow issues by allowing us to set a maximum input size, it manages spaces and newline characters effectively, which scanf() does not, and it captures the entire line of input, making it ideal for shell commands. Additionally, unlike gets(), which lacks bounds checking, fgets() offers a safer alternative. It also returns NULL when it encounters an EOF, which makes it convenient for handling situations like pressing Ctrl+D to exit the shell.
+
 
 2. You needed to use `malloc()` to allocte memory for `cmd_buff` in `dsh_cli.c`. Can you explain why you needed to do that, instead of allocating a fixed-size array?
 
-    > **Answer**:  _start here_
+    > **Answer**: In dsh_cli.c, malloc() was used to allocate memory for cmd_buff instead of using a fixed-size array because it gives us the flexibility to dynamically allocate memory based on the size of the input. Fixed-size arrays can be inefficient and waste memory if the input is smaller than the array size, or they may not be large enough to accommodate larger inputs. Using malloc() allows us to allocate just enough memory to handle the input, improving efficiency and ensuring that we avoid any memory limitations that would arise from a static array size.
 
 
 3. In `dshlib.c`, the function `build_cmd_list(`)` must trim leading and trailing spaces from each command before storing it. Why is this necessary? If we didn't trim spaces, what kind of issues might arise when executing commands in our shell?
 
-    > **Answer**:  _start here_
+    > **Answer**:  Trimming leading and trailing spaces during command parsing is crucial because spaces at the beginning or end of a command could cause the shell to misinterpret it, preventing the command from executing correctly. Functions like execvp() rely on an exact match of the command name, and any extra spaces would cause a mismatch, leading to errors. By removing unnecessary spaces, we ensure consistent behavior for commands, even when users enter extra whitespace. Additionally, trimming spaces helps avoid potential issues when storing command history or parsing arguments, making sure everything is processed as intended. This practice also mirrors the behavior of standard shells, such as Bash, which automatically trim spaces to ensure cleaner, more reliable command
 
 4. For this question you need to do some research on STDIN, STDOUT, and STDERR in Linux. We've learned this week that shells are "robust brokers of input and output". Google _"linux shell stdin stdout stderr explained"_ to get started.
 
 - One topic you should have found information on is "redirection". Please provide at least 3 redirection examples that we should implement in our custom shell, and explain what challenges we might have implementing them.
 
-    > **Answer**:  _start here_
+    > **Answer**:  1. Output redirection (> and >>): This allows redirecting STDOUT to a file. The challenge here is managing the file creation and append modes, as well as handling file permissions to ensure proper access. 2. Input redirection (<): This reads input from a file instead of the keyboard. The main challenge is switching the input stream correctly and dealing with potential file access errors or missing files. 3. Error redirection (2>): This redirects STDERR to a file. The difficulty lies in managing separate file descriptors for the error stream and ensuring the appropriate handling of error messages.
 
 - You should have also learned about "pipes". Redirection and piping both involve controlling input and output in the shell, but they serve different purposes. Explain the key differences between redirection and piping.
 
-    > **Answer**:  _start here_
+    > **Answer**:  Redirection and piping both manage input and output in the shell, but they serve different purposes. Redirection links processes to files, whereas pipes link processes to each other. With pipes, data flows continuously between commands in real-time, while redirection involves static files. Pipes facilitate communication through memory buffers, enabling inter-process communication (IPC), while redirection operates by interacting with the filesystem. Pipes allow for bidirectional communication between processes, whereas redirection typically transfers data in only one direction. Lastly, pipes are temporary and managed in memory, while redirection modifies files permanently, making those changes persistent.
 
 - STDERR is often used for error messages, while STDOUT is for regular output. Why is it important to keep these separate in a shell?
 
-    > **Answer**:  _start here_
+    > **Answer**:  Separating STDERR from STDOUT is essential for a number of reasons. It ensures that error messages remain visible even when the standard output is redirected to a file or another process, helping users to still see errors when regular output is redirected. By keeping the two streams separate, we can handle errors differently from regular output, which allows for more flexible error management. It also prevents error messages from contaminating data that is being piped between commands, ensuring clean data flow. Additionally, separating the two makes it easier to log errors independently, which can be useful for debugging and monitoring system behavior. This distinction between errors and expected output helps when troubleshooting, providing better clarity for developers or system administrators.
 
 - How should our custom shell handle errors from commands that fail? Consider cases where a command outputs both STDOUT and STDERR. Should we provide a way to merge them, and if so, how?
 
-    > **Answer**:  _start here_
+    > **Answer**:  When handling errors from commands that fail, the custom shell should display STDERR in a way that makes it easy to identify, such as using distinct colors or prefixes. The shell should also support the 2>&1 operator to merge STDERR with STDOUT when needed, providing flexibility for users who want to capture both outputs in one stream. It's important to return appropriate exit codes to indicate whether a command succeeded or failed, as this is crucial for error handling, especially when scripting or chaining commands. Moreover, the shell should offer an option to log errors separately from regular output, so errors can be reviewed without mixing with normal command results. Lastly, allowing users to customize error handling through shell configuration would give them greater control over how errors are displayed and managed, making the shell more adaptable to different user preferences and use cases.
